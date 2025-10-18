@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Card,
   CardHeader,
@@ -9,11 +9,29 @@ import {
   Chip,
   LinearProgress,
   Stack,
-  Button
+  Button,
+  IconButton,
+  Divider
 } from '@mui/material';
-import { CheckCircle, Psychology, HelpOutline } from '@mui/icons-material';
+import { CheckCircle, Psychology, HelpOutline, ThumbUp, ThumbDown } from '@mui/icons-material';
 
-export default function PredictionResultCard({ predictionResult, onHelpClick }) {
+export default function PredictionResultCard({ predictionResult, onHelpClick, onFeedback }) {
+  const [userFeedback, setUserFeedback] = useState(null); // 'positive', 'negative', or null
+
+  const handleFeedback = (feedbackType) => {
+    const newFeedback = userFeedback === feedbackType ? null : feedbackType;
+    setUserFeedback(newFeedback);
+    
+    // Call parent callback if provided
+    if (onFeedback) {
+      onFeedback({
+        prediction: predictionResult.prediction_label,
+        feedback: newFeedback,
+        probabilities: predictionResult.probabilities
+      });
+    }
+  };
+
   return (
     <Card>
       <CardHeader
@@ -31,7 +49,6 @@ export default function PredictionResultCard({ predictionResult, onHelpClick }) 
               <Typography variant="h4" color="primary.main" fontWeight="bold">
                 {predictionResult.prediction_label}
               </Typography>
-             
             </Card>
             
             {predictionResult.probabilities && (
@@ -70,6 +87,53 @@ export default function PredictionResultCard({ predictionResult, onHelpClick }) 
                 </Stack>
               </Box>
             )}
+
+            {/* User Feedback Section */}
+            <Box>
+              <Divider sx={{ mb: 2 }} />
+              <Typography variant="body2" color="text.secondary" textAlign="center" gutterBottom>
+                Was this prediction helpful?
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
+                <IconButton
+                  onClick={() => handleFeedback('positive')}
+                  sx={{
+                    color: userFeedback === 'positive' ? 'success.main' : 'grey.500',
+                    bgcolor: userFeedback === 'positive' ? 'success.50' : 'transparent',
+                    border: userFeedback === 'positive' ? '2px solid' : '1px solid',
+                    borderColor: userFeedback === 'positive' ? 'success.main' : 'grey.300',
+                    '&:hover': {
+                      bgcolor: 'success.50',
+                      color: 'success.main',
+                      borderColor: 'success.main',
+                    },
+                  }}
+                >
+                  <ThumbUp />
+                </IconButton>
+                <IconButton
+                  onClick={() => handleFeedback('negative')}
+                  sx={{
+                    color: userFeedback === 'negative' ? 'error.main' : 'grey.500',
+                    bgcolor: userFeedback === 'negative' ? 'error.50' : 'transparent',
+                    border: userFeedback === 'negative' ? '2px solid' : '1px solid',
+                    borderColor: userFeedback === 'negative' ? 'error.main' : 'grey.300',
+                    '&:hover': {
+                      bgcolor: 'error.50',
+                      color: 'error.main',
+                      borderColor: 'error.main',
+                    },
+                  }}
+                >
+                  <ThumbDown />
+                </IconButton>
+              </Box>
+              {userFeedback && (
+                <Typography variant="caption" color="text.secondary" textAlign="center" display="block">
+                  Thank you for your feedback!
+                </Typography>
+              )}
+            </Box>
 
             {/* Help Button */}
             <Box sx={{ textAlign: 'center', mt: 2 }}>

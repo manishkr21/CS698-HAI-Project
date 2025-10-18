@@ -46,6 +46,22 @@ export default function PredictionTab({
   onNavigateToHelp
 }) {
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [feedbackHistory, setFeedbackHistory] = useState([]);
+
+  // Handle user feedback
+  const handleFeedback = (feedbackData) => {
+    const feedbackEntry = {
+      ...feedbackData,
+      timestamp: new Date().toISOString(),
+      biasMethod: biasMitigation,
+      studentData: predictionForm
+    };
+    
+    setFeedbackHistory(prev => [...prev, feedbackEntry]);
+    
+    // Log feedback for debugging (could be sent to backend in real implementation)
+    console.log('User feedback received:', feedbackEntry);
+  };
 
   // Define features used by bias-mitigated model
   const biasMitigatedFeatures = [
@@ -365,6 +381,7 @@ export default function PredictionTab({
             <PredictionResultCard 
               predictionResult={predictionResult}
               onHelpClick={onNavigateToHelp}
+              onFeedback={handleFeedback}
             />
           )}
         </>
