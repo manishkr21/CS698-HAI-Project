@@ -34,7 +34,7 @@ export default function PredictionResultCard({ predictionResult, onHelpClick }) 
              
             </Card>
             
-            {predictionResult.probabilities.prob && (
+            {predictionResult.probabilities && (
               <Box>
                 <Typography variant="h6" gutterBottom textAlign="center">
                   Confidence Levels
