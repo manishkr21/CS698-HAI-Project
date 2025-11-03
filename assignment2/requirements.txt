@@ -6,3 +6,4 @@ seaborn==0.13.2
 imblearn
 xgboost
 ipykernel==6.30.1
+shap
