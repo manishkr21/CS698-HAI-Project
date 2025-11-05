@@ -1,4 +1,4 @@
 {
-    "API_BASE_URL": "http://localhost:8001",
-    "API_BASE_URL_PROD": "https://cdis.iitk.ac.in/student_app/"
+    "API_BASE_URL_LOCAL": "http://localhost:8001",
+    "API_BASE_URL": "https://cdis.iitk.ac.in/student_app/"
 }
