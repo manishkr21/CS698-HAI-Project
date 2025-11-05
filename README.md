@@ -47,11 +47,26 @@
 
 ### Demo Images
 
+Home page
 ![Demo Image 1](./demo/s1.png)
+
+Acedemic Information Form
 ![Demo Image 2](./demo/s2.png)
+
+Student Dropout Prediction Model Output
 ![Demo Image 3](./demo/s3.png)
+
+Student Dropout Prediction Model Explanation
 ![Demo Image 4](./demo/s4.png)
+
+Student Dropout Prediction Model Comparison
 ![Demo Image 5](./demo/s5.png)
+
+Student Dropout Prediction Model Explanation with SHAP Beeswarm Plot
 ![Demo Image 6](./demo/s6.png)
+
+Student Dropout Prediction Model Explanation with SHAP Beeswarm Plot - Continued
 ![Demo Image 7](./demo/s7.png)
+
+Student Dropout Prediction Model Help Section
 ![Demo Image 8](./demo/s8.png)
