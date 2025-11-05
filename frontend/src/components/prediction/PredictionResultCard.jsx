@@ -1,176 +1,168 @@
 import React, { useState } from 'react';
 import {
-  Card,
-  CardHeader,
-  CardContent,
-  Avatar,
   Box,
+  Card,
+  CardContent,
   Typography,
-  Chip,
   LinearProgress,
   Stack,
+  Divider,
   Button,
   IconButton,
-  Divider
+  Alert,
+  Tooltip
 } from '@mui/material';
-import { CheckCircle, Psychology, HelpOutline, ThumbUp, ThumbDown } from '@mui/icons-material';
+import {
+  ThumbUp,
+  ThumbDown,
+  Psychology,
+  HelpOutline,
+  Analytics
+} from '@mui/icons-material';
 
-export default function PredictionResultCard({ predictionResult, onHelpClick, onFeedback }) {
-  const [userFeedback, setUserFeedback] = useState(null); // 'positive', 'negative', or null
+export default function PredictionResultCard({ predictionResult, onHelpClick, onFeedback, onViewExplanation }) {
+  const [feedback, setFeedback] = useState(null);
+  const [showThankYou, setShowThankYou] = useState(false);
 
-  const handleFeedback = (feedbackType) => {
-    const newFeedback = userFeedback === feedbackType ? null : feedbackType;
-    setUserFeedback(newFeedback);
-    
-    // Call parent callback if provided
-    if (onFeedback) {
-      onFeedback({
-        prediction: predictionResult.prediction_label,
-        feedback: newFeedback,
-        probabilities: predictionResult.probabilities
-      });
+  const PREDICTION_CLASS = ["Enrolled", "Dropout", "Graduate"];
+
+  const handleFeedback = (isPositive) => {
+    if (feedback === isPositive) {
+      setFeedback(null);
+      onFeedback({ helpful: null });
+    } else {
+      setFeedback(isPositive);
+      onFeedback({ helpful: isPositive });
+      setShowThankYou(true);
+      setTimeout(() => setShowThankYou(false), 3000);
     }
   };
 
-  return (
-    <Card>
-      <CardHeader
-        avatar={<Avatar sx={{ bgcolor: 'success.main' }}><CheckCircle /></Avatar>}
-        title="Prediction Result"
-        titleTypographyProps={{ variant: 'h6' }}
-      />
-      <CardContent>
-        {predictionResult ? (
-          <Stack spacing={3}>
-            <Card variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: 'primary.50' }}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                PREDICTION
-              </Typography>
-              <Typography variant="h4" color="primary.main" fontWeight="bold">
-                {predictionResult.prediction_label}
-              </Typography>
-            </Card>
-            
-            {predictionResult.probabilities && (
-              <Box>
-                <Typography variant="h6" gutterBottom textAlign="center">
-                  Confidence Levels
-                </Typography>
-                <Stack spacing={2}>
-                  {Object.entries(predictionResult.probabilities)
-                    .filter(([label, prob]) => prob > 0)
-                    .map(([label, prob]) => (
-                      <Box key={label}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                          <Typography variant="body2" fontWeight="medium">
-                            {label}
-                          </Typography>
-                          <Typography variant="body2" color="primary.main" fontWeight="bold">
-                            {(prob * 100).toFixed(1)}%
-                          </Typography>
-                        </Box>
-                        <LinearProgress
-                          variant="determinate"
-                          value={prob * 100}
-                          sx={{
-                            height: 8,
-                            borderRadius: 5,
-                            bgcolor: 'grey.200',
-                            '& .MuiLinearProgress-bar': {
-                              borderRadius: 5,
-                              background: 'linear-gradient(45deg, #1976d2 30%, #9c27b0 90%)',
-                            },
-                          }}
-                        />
-                      </Box>
-                    ))}
-                </Stack>
-              </Box>
-            )}
-
-            {/* User Feedback Section */}
-            <Box>
-              <Divider sx={{ mb: 2 }} />
-              <Typography variant="body2" color="text.secondary" textAlign="center" gutterBottom>
-                Was this prediction helpful?
-              </Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
-                <IconButton
-                  onClick={() => handleFeedback('positive')}
-                  sx={{
-                    color: userFeedback === 'positive' ? 'success.main' : 'grey.500',
-                    bgcolor: userFeedback === 'positive' ? 'success.50' : 'transparent',
-                    border: userFeedback === 'positive' ? '2px solid' : '1px solid',
-                    borderColor: userFeedback === 'positive' ? 'success.main' : 'grey.300',
-                    '&:hover': {
-                      bgcolor: 'success.50',
-                      color: 'success.main',
-                      borderColor: 'success.main',
-                    },
-                  }}
-                >
-                  <ThumbUp />
-                </IconButton>
-                <IconButton
-                  onClick={() => handleFeedback('negative')}
-                  sx={{
-                    color: userFeedback === 'negative' ? 'error.main' : 'grey.500',
-                    bgcolor: userFeedback === 'negative' ? 'error.50' : 'transparent',
-                    border: userFeedback === 'negative' ? '2px solid' : '1px solid',
-                    borderColor: userFeedback === 'negative' ? 'error.main' : 'grey.300',
-                    '&:hover': {
-                      bgcolor: 'error.50',
-                      color: 'error.main',
-                      borderColor: 'error.main',
-                    },
-                  }}
-                >
-                  <ThumbDown />
-                </IconButton>
-              </Box>
-              {userFeedback && (
-                <Typography variant="caption" color="text.secondary" textAlign="center" display="block">
-                  Thank you for your feedback!
-                </Typography>
-              )}
-            </Box>
-
-            {/* Help Button */}
-            <Box sx={{ textAlign: 'center', mt: 2 }}>
-              <Button
-                variant="outlined"
-                startIcon={<HelpOutline />}
-                onClick={onHelpClick}
-                sx={{
-                  borderColor: '#1976d2',
-                  color: '#1976d2',
-                  '&:hover': {
-                    borderColor: '#9c27b0',
-                    bgcolor: 'rgba(156, 39, 176, 0.05)',
-                    color: '#9c27b0',
-                  },
-                  fontWeight: 600,
-                  px: 3,
-                  py: 1,
-                }}
-              >
-                Why this result? Learn More
-              </Button>
-            </Box>
-          </Stack>
-        ) : (
-          <Box sx={{ textAlign: 'center', py: 6 }}>
-            <Avatar sx={{ bgcolor: 'grey.300', mx: 'auto', mb: 2, width: 64, height: 64 }}>
-              <Psychology sx={{ fontSize: 32, color: 'grey.600' }} />
-            </Avatar>
-            <Typography variant="h6" color="text.secondary">
-              No prediction yet
+  if (!predictionResult) {
+    return (
+      <Card>
+        <CardContent>
+          <Box sx={{ textAlign: 'center', py: 3 }}>
+            <Psychology sx={{ fontSize: 40, color: 'text.secondary', mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              No Prediction Yet
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Enter features and click predict
             </Typography>
           </Box>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardContent>
+        {/* Prediction Result Header */}
+        <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Prediction Result
+          </Typography>
+          <Typography 
+            variant="h4" 
+            color="primary" 
+            sx={{ fontWeight: 700, mb: 1 }}
+          >
+            {PREDICTION_CLASS[predictionResult.prediction]}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {predictionResult.model_used}
+          </Typography>
+        </Box>
+
+        {/* Class Probabilities */}
+        {predictionResult.probabilities && (
+          <Box sx={{ mb: 3, maxWidth: "400px", mx: 'auto' }} >
+            <Typography variant="subtitle2" gutterBottom>
+              Class Probabilities
+            </Typography>
+            <Stack spacing={2}>
+              {Object.entries(predictionResult.probabilities)
+                .sort((a, b) => b[1] - a[1]) // Sort by probability
+                .map(([className, prob]) => (
+                  <Box key={className}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                      <Typography variant="body2">
+                        {className}
+                      </Typography>
+                      <Typography variant="body2" fontWeight="medium">
+                        {(prob * 100).toFixed(1)}%
+                      </Typography>
+                    </Box>
+                    <LinearProgress
+                      variant="determinate"
+                      value={prob * 100}
+                      sx={{
+                        height: 8,
+                        borderRadius: 5,
+                        bgcolor: 'grey.200',
+                        '& .MuiLinearProgress-bar': {
+                          borderRadius: 5,
+                          background: 'linear-gradient(45deg, #1976d2 30%, #9c27b0 90%)',
+                        },
+                      }}
+                    />
+                  </Box>
+                ))}
+            </Stack>
+          </Box>
         )}
+
+        {/* Action Buttons */}
+        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mb: 3 }}>
+          <Button
+            variant="outlined"
+            startIcon={<HelpOutline />}
+            onClick={onHelpClick}
+          >
+            Help Me Understand
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<Analytics />}
+            onClick={onViewExplanation}
+            color="secondary"
+          >
+            View Explanation
+          </Button>
+        </Box>
+
+        {/* User Feedback Section */}
+        <Box>
+          <Divider sx={{ mb: 2 }} />
+          <Typography variant="body2" color="text.secondary" textAlign="center" gutterBottom>
+            Was this prediction helpful?
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Tooltip title="This prediction was helpful">
+              <IconButton
+                onClick={() => handleFeedback(true)}
+                color={feedback === true ? 'success' : 'default'}
+              >
+                <ThumbUp />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="This prediction was not helpful">
+              <IconButton
+                onClick={() => handleFeedback(false)}
+                color={feedback === false ? 'error' : 'default'}
+              >
+                <ThumbDown />
+              </IconButton>
+            </Tooltip>
+          </Box>
+          {showThankYou && (
+            <Alert severity="success" sx={{ mt: 2 }}>
+              Thank you for your feedback!
+            </Alert>
+          )}
+        </Box>
       </CardContent>
     </Card>
   );

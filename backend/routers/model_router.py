@@ -97,11 +97,8 @@ async def train_endpoint(file: UploadFile = File(...)):
         # Read CSV
         contents = await file.read()
         
-        # Try different separators
-        try:
-            df = pd.read_csv(pd.io.common.BytesIO(contents), sep=';')
-        except:
-            df = pd.read_csv(pd.io.common.BytesIO(contents), sep=',')
+        # Try to read with semicolon delimiter first
+        df = pd.read_csv(pd.io.common.BytesIO(contents), sep=';')
         
         print(f"Loaded dataset with shape: {df.shape}")
         print(f"Columns: {df.columns.tolist()}")

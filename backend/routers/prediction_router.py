@@ -11,7 +11,7 @@ from models.schemas import (
     PredictionOutput, BiasMitigation
 )
 from repositories.model_repository import (
-    predict_baseline, predict_mitigated, load_artifact, check_model_exists, predict_fair
+    predict_baseline, predict_mitigated, load_artifact, check_model_exists, predict_fair, train_fair_model
 )
 from utils.config import FEATURE_NAMES, CLASS_NAMES, SENSITIVE_FEATURE
 
@@ -106,6 +106,8 @@ def predict_with_bias_mitigation(
         result = predict_baseline(input_data.features)
         result['bias_mitigation'] = bias_mitigation.value
     
+    print(f"Prediction result with {bias_mitigation.value} bias mitigation: {result}")
+
     return PredictionOutput(**result)
     # except FileNotFoundError as e:
     #     raise HTTPException(status_code=503, detail=f"Model not loaded: {str(e)}")

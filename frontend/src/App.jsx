@@ -25,7 +25,8 @@ import {
   BarChart,
   Assessment,
   CompareArrows,
-  HelpOutline
+  HelpOutline,
+  Analytics
 } from '@mui/icons-material';
 
 // Import modular components
@@ -34,9 +35,12 @@ import PerformanceFairnessTab from './components/PerformanceFairnessTab';
 import PredictionTab from './components/PredictionTab';
 import CompareModelsTab from './components/CompareModelsTab';
 import HelpTab from './components/HelpTab';
+// import ExplanationTab from './components/old3543gdg/ExplanationTab';
+import ModelExplanation from './components/ModelExplanation56';
+import LocalExplanation from './components/LocalExplanation';
 import logo from './assets/logo.png';
-// const API_URL = 'http://localhost:8000';
-const API_URL = 'https://cdis.iitk.ac.in/student_app';
+import config from './resources/config.json';
+const API_URL = config.API_BASE_URL;
 
 // Create Material-UI theme
 const theme = createTheme({
@@ -143,6 +147,8 @@ export default function StudentDropoutDashboard() {
   const [comparisonResult, setComparisonResult] = useState(null);
   const [fairnessSummary, setFairnessSummary] = useState(null);
   const [predicting, setPredicting] = useState(false);
+  const [predictionFeatures, setPredictionFeatures] = useState(null);
+  const [selectedExplanationModel, setSelectedExplanationModel] = useState('best_model');
 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -236,6 +242,8 @@ export default function StudentDropoutDashboard() {
     setPredicting(true);
     try {
       const features = Object.values(predictionForm);
+      setPredictionFeatures(features); // Store features for explanations
+      
       const res = await fetch(`${API_URL}/predict/with-bias-mitigation?bias_mitigation=${biasMitigation}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -271,7 +279,11 @@ export default function StudentDropoutDashboard() {
   };
 
   const handleNavigateToHelp = () => {
-    setActiveTab(2); // Navigate to Help tab (index 2)
+    setActiveTab(3); // Navigate to Help tab (index 3)
+  };
+
+  const handleNavigateToExplanation = () => {
+    setActiveTab(2); // Navigate to Explanation tab
   };
 
   const handleFileUpload = async (e) => {
@@ -312,7 +324,7 @@ export default function StudentDropoutDashboard() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg,rgb(89, 104, 172) 0%,rgb(72, 82, 218) 100%)',
           }}
         >
           <Paper elevation={8} sx={{ p: 6, borderRadius: 4, textAlign: 'center', maxWidth: 400 }}>
@@ -335,7 +347,7 @@ export default function StudentDropoutDashboard() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg,rgb(89, 104, 172) 0%,rgb(72, 82, 218) 100%)',
             p: 3,
           }}
         >
@@ -382,7 +394,7 @@ export default function StudentDropoutDashboard() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Box sx={{ bgcolor: 'background.default' }}>
         {/* App Bar */}
         <AppBar position="sticky" elevation={2}>
           <Toolbar sx={{ py: 1.5 }}>
@@ -413,9 +425,9 @@ export default function StudentDropoutDashboard() {
           </Toolbar>
         </AppBar>
 
-        <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Container maxWidth="xl" sx={{ py: 3 }}>
           {/* Navigation Tabs */}
-          <Paper elevation={2} sx={{ mb: 4, borderRadius: 3 }}>
+          <Paper elevation={2} sx={{ mb: 0, borderRadius: 3 }}>
             <Tabs
               value={activeTab}
               onChange={(e, newValue) => setActiveTab(newValue)}
@@ -425,6 +437,7 @@ export default function StudentDropoutDashboard() {
             >
               <Tab icon={<Psychology />} label="Predict" iconPosition="start" />
               <Tab icon={<BarChart />} label="Performance & Fairness" iconPosition="start" />
+              <Tab icon={<Analytics />} label="Explanations" iconPosition="start" />
               <Tab icon={<HelpOutline />} label="Help" iconPosition="start" />
             </Tabs>
           </Paper>
@@ -440,7 +453,17 @@ export default function StudentDropoutDashboard() {
               predicting={predicting}
               handlePredict={handlePredict}
               onNavigateToHelp={handleNavigateToHelp}
+              onNavigateToExplanation={handleNavigateToExplanation}
             />
+            {predictionResult && (
+              <LocalExplanation
+                selectedModel={selectedExplanationModel}
+                features={predictionFeatures}
+                featureNames={Object.keys(predictionForm)}
+                prediction={predictionResult}
+                classNames={['Dropout', 'Continue']}
+              />
+            )}
           </TabPanel>
 
           <TabPanel value={activeTab} index={1}>
@@ -448,6 +471,14 @@ export default function StudentDropoutDashboard() {
           </TabPanel>
 
           <TabPanel value={activeTab} index={2}>
+            {/* <ExplanationTab 
+              predictionResult={predictionResult}
+              predictionFeatures={predictionFeatures}
+            /> */}
+            <ModelExplanation />
+          </TabPanel>
+
+          <TabPanel value={activeTab} index={3}>
             <HelpTab />
           </TabPanel>
         </Container>

@@ -43,7 +43,8 @@ export default function PredictionTab({
   predictionResult,
   predicting,
   handlePredict,
-  onNavigateToHelp
+  onNavigateToHelp,
+  onNavigateToExplanation
 }) {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [feedbackHistory, setFeedbackHistory] = useState([]);
@@ -61,6 +62,12 @@ export default function PredictionTab({
     
     // Log feedback for debugging (could be sent to backend in real implementation)
     console.log('User feedback received:', feedbackEntry);
+  };
+
+  // Handle explanation button click
+  const handleViewExplanation = () => {
+    // Navigate to explanation tab (index 2)
+    onNavigateToExplanation?.();
   };
 
   // Define features used by bias-mitigated model
@@ -245,7 +252,7 @@ export default function PredictionTab({
   return (
     <Box>
       {/* Header with Bias Method Toggle */}
-      <Card sx={{ mb: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+      <Card sx={{ mb: 3, background: 'linear-gradient(135deg,rgb(89, 104, 172) 0%,rgb(72, 82, 218) 100%)', color: 'white' }}>
         <CardContent>
           <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
             <Box>
@@ -302,7 +309,7 @@ export default function PredictionTab({
               </Box>
 
               {/* Form Fields Container */}
-              <Paper variant="outlined" sx={{ p: 3, bgcolor: 'grey.50', maxHeight: 600, overflow: 'auto' }}>
+              <Paper variant="outlined" sx={{ p: 3, bgcolor: 'grey.50' }}>
                 {/* Student Information - Only show if there are filtered fields */}
                 {filteredGeneralFields.length > 0 && (
                   <>
@@ -357,7 +364,7 @@ export default function PredictionTab({
               </Paper>
               
               {/* Predict Button */}
-              <Box sx={{ mt: 3 }}>
+              <Box sx={{ mt: 3, maxWidth: 400, mx: 'auto' }}>
                 <Button
                   fullWidth
                   variant="contained"
@@ -366,7 +373,7 @@ export default function PredictionTab({
                   startIcon={predicting ? <CircularProgress size={20} color="inherit" /> : <Psychology />}
                   disabled={predicting}
                   sx={{
-                    background: 'linear-gradient(45deg, #9c27b0 30%, #1976d2 90%)',
+                    background: 'linear-gradient(135deg,rgb(89, 104, 172) 0%,rgb(72, 82, 218) 100%)',
                     py: 2,
                   }}
                 >
@@ -382,6 +389,7 @@ export default function PredictionTab({
               predictionResult={predictionResult}
               onHelpClick={onNavigateToHelp}
               onFeedback={handleFeedback}
+              onViewExplanation={handleViewExplanation}
             />
           )}
         </>

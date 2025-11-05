@@ -62,7 +62,7 @@ class StudentData(BaseModel):
     gdp: float
 
 class PredictionOutput(BaseModel):
-    prediction: str
+    prediction: int
     prediction_label: str
     probabilities: Optional[Dict[str, float]]
     model_used: str

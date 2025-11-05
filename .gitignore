@@ -11,7 +11,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+*.pkl
 
+backend/output.txt
 
 node_modules
 dist

@@ -7,13 +7,13 @@ from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 from pathlib import Path
 
-from routers import model_router, prediction_router, fairness_router
+from routers import model_router, prediction_router, fairness_router, explanation_router, lime_router
 from repositories.model_repository import train_models
 
 # Create FastAPI app
 app = FastAPI(
     title="Student Dropout Prediction API",
-    description="ML API with bias mitigation and fairness evaluation for student dropout prediction",
+    description="ML API with bias mitigation, fairness evaluation, and SHAP explanations",
     version="2.0.0"
 )
 
@@ -30,6 +30,12 @@ app.add_middleware(
 app.include_router(model_router.router)
 app.include_router(prediction_router.router)
 app.include_router(fairness_router.router)
+app.include_router(explanation_router.router)
+app.include_router(lime_router.router)  # Add LIME router
+
+# if not exist create artifacts directory
+artifacts_path = Path('artifacts')
+artifacts_path.mkdir(parents=True, exist_ok=True)
 
 
 if __name__ == "__main__":
@@ -61,4 +67,4 @@ if __name__ == "__main__":
     print("API Documentation: http://localhost:8000/docs")
     print("="*70 + "\n")
     
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)
