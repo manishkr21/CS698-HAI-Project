@@ -30,10 +30,14 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/CS698-HAI-Project/',
+  base: process.env.VITE_BASE_PATH || '/CS698-HAI-Project',
   server: {
     proxy: {
-      '/api': 'http://localhost:8001'
+      '/api': {
+        target: process.env.VITE_API_URL || 'http://localhost:8001',
+        changeOrigin: true,
+        secure: false,
+      }
     },
   },
   build: {
